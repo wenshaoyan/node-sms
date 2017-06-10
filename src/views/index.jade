@@ -1,0 +1,129 @@
+extends layout
+
+block content
+    div
+        section.content
+            .callout.callout-info
+                h4 短信
+            .row.col-md-8.col-md-offset-2
+                #contentId
+                .box.box-solid
+                    .box-header.with-border
+                        i.fa.fa-text-width
+                        h3.box-title
+                    // /.box-header
+                    .box-body
+                        form#formId(role="form", action="#")
+                            // text input
+                            .form-group
+                                label 输入金额
+                                input.form-control(name="price", type="number", placeholder="Enter ...")
+                            .form-group
+                                label 输入号码列表
+                                textarea.form-control(name="tels", rows="3", placeholder="多个号码以逗号隔开")
+                            input#btnPostId.btn.btn-block.btn-info.btn-lg(value="提交")
+                    // /.box-body
+                    br
+    script(type='text/javascript').
+        // 获取提交的参数并检查参数是否合法
+        function getParams(from) {
+            let params = {};
+            try {
+                const t = $("#formId").serializeArray();
+                $.each(t, function () {
+                    params[this.name] = this.value;
+                });
+
+
+            } catch (e) {
+
+            }
+            return params;
+        }
+
+        function check(params) {
+            let result = {
+                b: false,
+                msg: "参数错误"
+            };
+            if (!params.price) {
+                result.msg = "金额必须填写";
+                return result;
+            }
+            if (!params.tels) {
+                result.msg = "号码必须填写";
+                return result;
+            }
+            if (params.price <= 0) {
+                result.msg = "金额必须大于0";
+                return result;
+            }
+            result.b = true;
+            return result;
+        }
+
+        $("#btnPostId").on("click", function (e) {
+            const params = getParams($("#formId"));
+            const result = check(params);
+            if (result.b) {
+                $.ajax({
+                    method: "POST",
+                    url: "/users/send",
+                    async: false,
+                    data: params,
+                    success: success,
+                    error: error
+
+                })
+            } else {
+                alert(result.msg);
+            }
+        });
+        function success(result) {
+            if (result.code == 0) {
+                $("#contentId").html(getResultInfo(result.params));
+            } else {
+                alert("错误");
+            }
+        }
+        function error(err) {
+            alert("错误");
+        }
+        function getResultInfo(params) {
+            let data = "";
+            let sty = "alert-danger";
+            let content = "发送失败";
+            let p1 = "号码:";
+            let p2 = "金额:";
+            let p3 = "时间:";
+            let p4 = "";
+            if (params) {
+                if (params.suc) {
+                    sty = "alert-info";
+                    content = "发送成功";
+                }
+                if (params.price) {
+                    p2 += params.price + "元";
+                }
+                if (params.tels) {
+                    p1 += params.tels;
+                }
+                if (params.time) {
+                    p3 += params.time;
+                }
+                if (params.error) {
+                    p4 = params.error;
+                }
+            }
+
+            data += `<div class="alert ${sty} alert-dismissible" >
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <h4><i class="icon fa fa-check"></i>${content}</h4>
+                    <p>${p1}</p>
+                <p>${p2}</p>
+                <p>${p3}</p>
+                <p>${p4}</p>
+                </div>`;
+            return data;
+
+        }
