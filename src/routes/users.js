@@ -1,6 +1,6 @@
-import koa_router from "koa-router";
+const koa_router =require("koa-router");
 const router = koa_router();
-import smsSdk from "../modules/smsSdk";
+const smsSdk =require("../modules/smsSdk");
 
 const TopClient = smsSdk.TopClient;
 const client = new TopClient({

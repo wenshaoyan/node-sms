@@ -1,14 +1,14 @@
-import Koa from "koa";
-import koa_router from "koa-router";
-import views from "koa-views";
-import convert from "koa-convert";
-import koaBodyParser from "koa-bodyparser";
-import json from "koa-json"
-import logger from "koa-logger";
-import index from "./routes/index";
-import users from "./routes/users";
-import koa_static from "koa-static";
-import koaCors from "koa-cors";
+const Koa=require("koa");
+const koa_router=require("koa-router");
+const views=require("koa-views");
+const convert=require("koa-convert");
+const koaBodyParser=require("koa-bodyparser");
+const json=require("koa-json");
+const logger=require("koa-logger");
+const index=require("./routes/index");
+const users=require("./routes/users");
+const koa_static=require("koa-static");
+const koaCors=require("koa-cors");
 const app = new Koa();
 const router = koa_router();
 

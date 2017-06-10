@@ -1,4 +1,4 @@
-import koa_router from "koa-router";
+const koa_router =require("koa-router");
 const router = koa_router();
 
 
