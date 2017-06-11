@@ -4,8 +4,8 @@ const smsSdk =require("../modules/smsSdk");
 
 const TopClient = smsSdk.TopClient;
 const client = new TopClient({
-    'appkey':'23492839',
-    'appsecret':'e90847ae379fd8b5af09fb928a24f28e',
+    'appkey':'24233581',
+    'appsecret':'6376401370d21d442e29acf4b029273a',
     'REST_URL':'http://gw.api.taobao.com/router/rest'});
 
 router.get('/', function (ctx, next) {
@@ -39,7 +39,7 @@ router.post('/send', async function (ctx, next) {
             'sms_free_sign_name': '快捷充值',
             'sms_param': JSON.stringify(sms_param),
             'rec_num': params.tels,
-            'sms_template_code': 'SMS_22410152'
+            'sms_template_code': 'SMS_70630225'
         });
         if ("error_response" in result){
             params.suc = false;
