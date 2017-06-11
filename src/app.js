@@ -4,29 +4,87 @@ const views=require("koa-views");
 const convert=require("koa-convert");
 const koaBodyParser=require("koa-bodyparser");
 const json=require("koa-json");
-const logger=require("koa-logger");
 const index=require("./routes/index");
 const users=require("./routes/users");
 const koa_static=require("koa-static");
 const koaCors=require("koa-cors");
 const app = new Koa();
 const router = koa_router();
+const logUtil = require('./utils/logUtil');
+const prototypeUtil = require('./utils/prototypeUtil');
+const session = require('koa-session');
+const Log = require('./modules/log');
+prototypeUtil.init();
 
 
 
 const bodyParser = koaBodyParser();
 
+app.keys = ['some secret hurr'];
+
+const CONFIG = {
+    key: 'koa:sess', /** (string) cookie key (default is koa:sess) */
+    /** (number || 'session') maxAge in ms (default is 1 days) */
+    /** 'session' will result in a cookie that expires when session/browser is closed */
+    /** Warning: If a session cookie is stolen, this cookie will never expire */
+    maxAge: 86400000,
+    overwrite: true, /** (boolean) can overwrite or not (default true) */
+    httpOnly: true, /** (boolean) httpOnly or not (default true) */
+    signed: true, /** (boolean) signed or not (default true) */
+};
 
 
 // middlewares
 app.use(convert(bodyParser));
 app.use(convert(json()));
-app.use(convert(logger()));
+// logger
+app.use(async (ctx, next) => {
+    //响应开始时间
+    const start = new Date();
+    //响应间隔时间
+    let ms;
+    try {
+        //开始进入到下一个中间件
+        await next();
+
+        ms = new Date() - start;
+        //记录响应日志
+        logUtil.logResponse(ctx, ms);
+
+    } catch (error) {
+
+        ms = new Date() - start;
+        //记录异常日志
+        logUtil.logError(ctx, error, ms);
+    }
+});
 app.use(koa_static(__dirname + '/public'));
 app.use(convert(koaCors()));
 app.use(views(__dirname + '/views', {
   extension: 'jade'
 }));
+
+
+app.use(session(CONFIG, app));
+
+
+
+app.use(async (ctx,next) => {
+    const urls = new Set(["/users/login","/favicon.ico"]);
+    // ignore favicon
+    if (urls.has(ctx.path)){
+        await next();
+        return;
+    }
+    if (ctx.session.id=="admin123"){
+        await next();
+    }else{
+        //await next();
+         ctx.redirect('/users/login');
+    }
+});
+
+
 
 // logger
 app.use(async (ctx, next) => {
@@ -37,6 +95,8 @@ app.use(async (ctx, next) => {
 });
 
 
+
+
 router.use('/', index.routes(), index.allowedMethods());
 router.use('/users', users.routes(), users.allowedMethods());
 
@@ -44,28 +104,9 @@ app.use(router.routes(), router.allowedMethods());
 // response
 
 app.on('error', function(err, ctx){
-  console.log(err);
   logger.error('server error', err, ctx);
 });
 
 
 
-Date.prototype.Format = function(fmt)
-{ //author: meizz
-    const o = {
-        "M+": this.getMonth() + 1,                 //月份
-        "d+": this.getDate(),                    //日
-        "h+": this.getHours(),                   //小时
-        "m+": this.getMinutes(),                 //分
-        "s+": this.getSeconds(),                 //秒
-        "q+": Math.floor((this.getMonth() + 3) / 3), //季度
-        "S": this.getMilliseconds()             //毫秒
-    };
-    if(/(y+)/.test(fmt))
-        fmt=fmt.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
-    for(let k in o)
-        if(new RegExp("("+ k +")").test(fmt))
-            fmt = fmt.replace(RegExp.$1, (RegExp.$1.length==1) ? (o[k]) : (("00"+ o[k]).substr((""+ o[k]).length)));
-    return fmt;
-}
 module.exports = app;

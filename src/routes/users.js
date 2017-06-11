@@ -10,10 +10,21 @@ const client = new TopClient({
 
 router.get('/', function (ctx, next) {
     ctx.body = 'this a users response!';
-
-    console.log(new Date().Format("yyyy年M月d日"))
 });
+router.get('/login',async (ctx,next)=>{
+    await ctx.render('login', {"error":"输入账号"});
+});
+router.post('/login',async (ctx,next)=>{
+    let params = ctx.request.body;
+    if (params.userName=="admin123"){
+        ctx.session.id="admin123";
+        ctx.redirect('/');
+    }else{
+        //ctx.redirect('/users/login');
+        await ctx.render('login', {"error":"账号错误！"});
+    }
 
+});
 // 发送短信
 router.post('/send', async function (ctx, next) {
     let params = ctx.request.body;
@@ -30,7 +41,6 @@ router.post('/send', async function (ctx, next) {
             'rec_num': params.tels,
             'sms_template_code': 'SMS_22410152'
         });
-        console.log(result)
         if ("error_response" in result){
             params.suc = false;
             params.error = result.error_response.sub_msg;

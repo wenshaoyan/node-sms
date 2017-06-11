@@ -1,0 +1,25 @@
+//Created by wenshao on 2017/6/11.
+extends layout_login
+block content
+
+    .lockscreen-wrapper
+        .lockscreen-item
+            .lockscreen-image
+                img(src="/image/image1.jpg", alt="User Image")
+
+            form.lockscreen-credentials(action="/users/login", method="post")
+                .input-group
+                    input.form-control(type="text", placeholder="账号" name="userName")
+                    .input-group-btn
+                        button.btn(type="submit")
+                            i.fa.fa-arrow-right.text-muted
+
+        .help-block.text-center=error
+
+
+
+        .lockscreen-footer.text-center
+
+            b
+                a.text-black(href="http://almsaeedstudio.com") Almsaeed Studio
+            br
