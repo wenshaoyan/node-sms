@@ -77,6 +77,7 @@ app.use(async (ctx,next) => {
         return;
     }
     if (ctx.session.id=="admin456"){
+
         await next();
     }else{
         //await next();
