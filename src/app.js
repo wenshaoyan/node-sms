@@ -76,7 +76,7 @@ app.use(async (ctx,next) => {
         await next();
         return;
     }
-    if (ctx.session.id=="admin123"){
+    if (ctx.session.id=="admin456"){
         await next();
     }else{
         //await next();
