@@ -17,7 +17,7 @@ router.get('/login',async (ctx,next)=>{
 router.post('/login',async (ctx,next)=>{
     let params = ctx.request.body;
     if (params.userName=="admin456"){
-        ctx.session.id="admin123";
+        ctx.session.id="admin456";
         ctx.redirect('/');
     }else{
         //ctx.redirect('/users/login');
